@@ -52,6 +52,10 @@ func main() {
 		panic(err)
 	}
 
+	if result.Error != nil {
+		panic(result.Error.Message)
+	}
+
 	fmt.Printf("total: %d\n", result.TotalResults)
 	for _, e := range result.Items {
 		fmt.Printf("%d: %s\n", e.Id, e.Title)
@@ -101,6 +105,10 @@ func main() {
 
 	if err != nil {
 		panic(err)
+	}
+
+	if result.Error != nil {
+		panic(result.Error.Message)
 	}
 
 	fmt.Printf("%d: %s\n", result.Id, result.Title)
