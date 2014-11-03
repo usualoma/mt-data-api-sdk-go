@@ -23,7 +23,7 @@ type Client struct {
 
 type ClientOptionsStruct struct {
 	OptEndpoint   string
-	OptAPIVersion string
+	OptApiVersion string
 	OptClientId   string
 	OptUsername   string
 	OptPassword   string
@@ -31,7 +31,7 @@ type ClientOptionsStruct struct {
 
 type ClientOptions interface {
 	Endpoint() string
-	APIVersion() string
+	ApiVersion() string
 	ClientId() string
 	Username() string
 	Password() string
@@ -65,8 +65,8 @@ func (o ClientOptionsStruct) Endpoint() string {
 	return o.OptEndpoint
 }
 
-func (o ClientOptionsStruct) APIVersion() string {
-	return o.OptAPIVersion
+func (o ClientOptionsStruct) ApiVersion() string {
+	return o.OptApiVersion
 }
 
 func (o ClientOptionsStruct) ClientId() string {
@@ -230,7 +230,7 @@ func (c *Client) SendRequest(method string, path string, params *RequestParamete
 		}
 	}
 
-	requestUrl := c.Opts.Endpoint() + "/v" + c.Opts.APIVersion() + path + queryString
+	requestUrl := c.Opts.Endpoint() + "/v" + c.Opts.ApiVersion() + path + queryString
 	req, err := (func() (*http.Request, error) {
 		if requestBody == nil {
 			return http.NewRequest(method, requestUrl, nil)

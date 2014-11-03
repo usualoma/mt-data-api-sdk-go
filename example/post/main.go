@@ -18,7 +18,7 @@ type EntryResult struct {
 func main() {
 	client := dataapi.NewClient(dataapi.ClientOptionsStruct{
 		OptEndpoint:   "http://example.com/path/to/mt/mt-data-api.cgi",
-		OptAPIVersion: "1",
+		OptApiVersion: "1",
 		OptClientId:   "go",
 		OptUsername:   "Melody",
 		OptPassword:   "password",
