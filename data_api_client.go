@@ -187,7 +187,7 @@ func marshal(v interface{}) ([]byte, error) {
 }
 
 func isFileType(v interface{}) bool {
-    return reflect.TypeOf(v) == reflect.TypeOf(&os.File{})
+	return reflect.TypeOf(v) == reflect.TypeOf(&os.File{})
 }
 
 func (c *Client) SendRequest(method string, path string, params *RequestParameters, result interface{}) error {
@@ -218,8 +218,8 @@ func (c *Client) SendRequest(method string, path string, params *RequestParamete
 			requestBody = &bytes.Buffer{}
 			writer = multipart.NewWriter(requestBody)
 			for k, v := range *params {
-			    if isFileType(v) {
-				    file := v.(*os.File)
+				if isFileType(v) {
+					file := v.(*os.File)
 					part, err := writer.CreateFormFile(k, filepath.Base(file.Name()))
 					if err != nil {
 						return err
@@ -280,17 +280,13 @@ func (c *Client) SendRequest(method string, path string, params *RequestParamete
 	var resultError *ResultError
 	resultError = errorField.Interface().(*ResultError)
 
-	if resultError != nil {
-		if resultError.Code == 401 {
-			var nilError *ResultError
-			errorField.Set(reflect.ValueOf(nilError))
+	if resultError != nil && resultError.Code == 401 {
+		var nilError *ResultError
+		errorField.Set(reflect.ValueOf(nilError))
 
-			c.accessTokenData.AccessToken = ""
+		c.accessTokenData.AccessToken = ""
 
-			return c.SendRequest(method, requestUrl, params, result)
-		} else {
-			return errors.New(resultError.Message)
-		}
+		return c.SendRequest(method, requestUrl, params, result)
 	}
 
 	return nil
