@@ -3,7 +3,6 @@ package dataapi
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -15,6 +14,18 @@ import (
 	"reflect"
 	"time"
 )
+
+type ErrorCode int
+type Error struct {
+	Message string
+	Code    ErrorCode
+}
+
+const (
+	AuthenticationError ErrorCode = iota + 1
+)
+
+func (e *Error) Error() string { return e.Message }
 
 type Client struct {
 	accessTokenData accessTokenData
@@ -147,7 +158,10 @@ func (c *Client) prepareAccessToken() error {
 		}
 		if data.AccessToken == "" {
 			c.accessTokenData = accessTokenData{}
-			return errors.New("Authentication error")
+			return &Error{
+				Message: "Authentication error",
+				Code:    AuthenticationError,
+			}
 		}
 	}
 
