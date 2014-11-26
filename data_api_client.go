@@ -60,6 +60,8 @@ type ResultError struct {
 	Code    int    `json:"code"`
 }
 
+func (e *ResultError) Error() string { return e.Message }
+
 type authenticationResult struct {
 	Result
 	SessionId     string      `json:"sessionId"`
