@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"time"
 )
 
@@ -55,21 +56,31 @@ type Result struct {
 }
 
 type ResultError struct {
-	Message string
-	Code    int
+	Message string `json:"message"`
+	Code    int    `json:"code"`
 }
 
 type authenticationResult struct {
 	Result
-	SessionId   string `json:"sessionId"`
-	AccessToken string `json:"accessToken"`
-	ExpiresIn   int    `json:"expiresIn"`
-	Remember    bool   `json:"remember"`
+	SessionId     string      `json:"sessionId"`
+	AccessToken   string      `json:"accessToken"`
+	ExpiresInData interface{} `json:"expiresIn"`
+	ExpiresIn     int         `json:"-"`
+	Remember      bool        `json:"remember"`
 }
 
 type accessTokenData struct {
 	authenticationResult
 	startTime time.Time
+}
+
+func (d *accessTokenData) Normalize() {
+	switch t := d.ExpiresInData.(type) {
+	case string:
+		d.ExpiresIn, _ = strconv.Atoi(t)
+	case float64:
+		d.ExpiresIn = int(t)
+	}
 }
 
 func (o ClientOptionsStruct) Endpoint() string {
@@ -137,6 +148,8 @@ func (c *Client) prepareAccessToken() error {
 		if err != nil {
 			return err
 		}
+		data.Normalize()
+
 		if data.AccessToken == "" {
 			c.accessTokenData = accessTokenData{}
 			return c.prepareAccessToken()
@@ -156,6 +169,8 @@ func (c *Client) prepareAccessToken() error {
 		if err != nil {
 			return err
 		}
+		data.Normalize()
+
 		if data.AccessToken == "" {
 			c.accessTokenData = accessTokenData{}
 			return &Error{
