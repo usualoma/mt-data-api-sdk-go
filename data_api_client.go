@@ -34,7 +34,7 @@ type Client struct {
 }
 
 type ClientOptionsStruct struct {
-	OptEndpoint   string
+	OptBaseUrl    string
 	OptApiVersion string
 	OptClientId   string
 	OptUsername   string
@@ -42,7 +42,7 @@ type ClientOptionsStruct struct {
 }
 
 type ClientOptions interface {
-	Endpoint() string
+	BaseUrl() string
 	ApiVersion() string
 	ClientId() string
 	Username() string
@@ -85,8 +85,8 @@ func (d *accessTokenData) Normalize() {
 	}
 }
 
-func (o ClientOptionsStruct) Endpoint() string {
-	return o.OptEndpoint
+func (o ClientOptionsStruct) BaseUrl() string {
+	return o.OptBaseUrl
 }
 
 func (o ClientOptionsStruct) ApiVersion() string {
@@ -130,7 +130,7 @@ func (c *Client) prepareAccessToken() error {
 
 	var data accessTokenData
 	if c.accessTokenData.SessionId != "" {
-		req, err := http.NewRequest("POST", c.Opts.Endpoint()+"/v1/token", nil)
+		req, err := http.NewRequest("POST", c.Opts.BaseUrl()+"/v1/token", nil)
 		if err != nil {
 			return err
 		}
@@ -157,7 +157,7 @@ func (c *Client) prepareAccessToken() error {
 			return c.prepareAccessToken()
 		}
 	} else {
-		resp, err := http.PostForm(c.Opts.Endpoint()+"/v1/authentication",
+		resp, err := http.PostForm(c.Opts.BaseUrl()+"/v1/authentication",
 			url.Values{"clientId": {c.Opts.ClientId()}, "username": {c.Opts.Username()}, "password": {c.Opts.Password()}})
 		if err != nil {
 			return err
@@ -261,13 +261,13 @@ func (c *Client) SendRequest(method string, path string, params *RequestParamete
 		}
 	}
 
-	requestUrl := c.Opts.Endpoint() + "/v" + c.Opts.ApiVersion() + path + queryString
+	requestUrl := c.Opts.BaseUrl() + "/v" + c.Opts.ApiVersion() + path + queryString
 	req, err := (func() (*http.Request, error) {
 		if requestBody == nil {
 			return http.NewRequest(method, requestUrl, nil)
-		} else {
-			return http.NewRequest(method, requestUrl, requestBody)
 		}
+
+		return http.NewRequest(method, requestUrl, requestBody)
 	})()
 	if err != nil {
 		return err
